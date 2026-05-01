@@ -1,0 +1,32 @@
+name: Update My Starred Repos
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  awesome-stars:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install starred
+        run: pip install starred
+
+      - name: Update README
+        run: |
+          starred --username zhou6392ying-dev --token ${{ secrets.GH_TOKEN }} --sort > README.md
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add README.md
+          git commit -m "Update starred repos" || echo "No changes"
+          git push
